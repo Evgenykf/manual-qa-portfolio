@@ -4,18 +4,20 @@ Aspiring QA Engineer | Manual Testing → Automation
 
 ## About
 
-I'm learning manual QA testing with the goal of moving into Automation and eventually DevOps. This repository documents my practice on [XQA.io](https://xqa.io), a QA training sandbox, where I test individual UI components and full forms, design test cases, and report bugs the way I would on a real project.
+I'm learning manual QA testing with the goal of moving into Automation and eventually DevOps. This repository documents my practice on [XQA.io](https://xqa.io), a QA training sandbox, as well as hands-on API testing in Postman, where I test individual UI components, full forms, and REST APIs, design test cases, write automated checks, and report bugs the way I would on a real project.
 
 ## Testing Approach
 
 Across these test cases, I apply the following techniques:
 
 - **Equivalence partitioning** — testing valid input, invalid input, and empty input as distinct classes for each field
-- **Boundary and negative testing** — verifying that actions which should NOT trigger a response actually don't (e.g. right-click shouldn't trigger a left-click message), and testing edge cases like oversized files, unrealistic dates, and malformed data
+- **Boundary and negative testing** — verifying that actions which should NOT trigger a response actually don't, and testing edge cases like oversized files, unrealistic dates, and malformed data
 - **Accessibility testing** — checking keyboard navigation (Tab focus) as a standard part of every component I test, not just mouse interaction
 - **Variable isolation** — for components with time-based behavior (Dynamic Properties), I tested timer accuracy, timer reset, and timer independence separately from click-response, to isolate the exact cause of a bug rather than reporting a vague symptom
 - **Root cause grouping** — when multiple symptoms share a likely single cause (e.g. both "Add" and "Edit" buttons failing to open a form), I document them as one bug report rather than duplicating tickets
 - **Mandatory field verification** — for every form, I explicitly test whether each field is required or optional, rather than assuming
+- **API state and consistency testing** — checking whether created/updated/deleted resources persist correctly, whether operations are idempotent (e.g. a repeated DELETE should return 404, not 204 again), and whether response schemas are consistent across related endpoints
+- **Automated assertions (Postman)** — writing `pm.test()` checks in JavaScript to verify status codes and response data automatically, instead of only inspecting responses manually
 
 ## A Recurring Finding
 
@@ -40,12 +42,20 @@ While testing individual components, I found the same keyboard-navigation issue 
 |--------|------|---------------|
 | Practice Form | [forms/practice-form.md](./forms/practice-form.md) | 38 test cases across 12 fields; 7 bugs found, including a Critical severity issue (executable file accepted as a picture upload) and a broken State→City dependency |
 
+### API Testing
+
+| Module | File | Key Findings |
+|--------|------|---------------|
+| REST API Playground (XQA) | [api-testing/rest-api-playground.md](./api-testing/rest-api-playground.md) | Mock API does not persist state between requests (POST/PUT/DELETE don't affect subsequent responses); inconsistent schema between endpoints |
+| ReqRes (Postman) | [api-testing/reqres-postman-tests.md](./api-testing/reqres-postman-tests.md) | Full CRUD cycle tested with automated `pm.test()` assertions, organized into a Collection with environment variables, executed via Collection Runner (4/4 tests passing). Found DELETE is not idempotent and inconsistent response structure between GET and PUT |
+
 ## Tools Used
 
 - Google Sheets (test case drafting)
 - Markdown (documentation format)
 - Git & GitHub (version control)
+- Postman (API testing, automated assertions, Collections, Environment variables, Collection Runner)
 
 ## Next Steps
 
-Currently expanding this portfolio with API testing (REST API Playground) and a full end-to-end test plan (Book Store Application), before moving on to test automation with Python/JavaScript and Playwright.
+Currently expanding this portfolio with focused Accessibility Testing (Screen Reader, Color Contrast, Skip Links) and a full end-to-end test plan (Book Store Application), before moving on to test automation with Python/JavaScript and Playwright.
