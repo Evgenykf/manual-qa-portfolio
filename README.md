@@ -56,6 +56,7 @@ Both patterns reflect the same underlying habit: cross-checking a hypothesis acr
 | ReqRes (Postman) | [api-testing/reqres-postman-tests.md](./api-testing/reqres-postman-tests.md) | Full CRUD cycle tested with automated `pm.test()` assertions, organized into a Collection with environment variables, executed via Collection Runner (4/4 tests passing). Found DELETE is not idempotent and inconsistent response structure between GET and PUT |
 | JSONPlaceholder (Postman) | [api-testing/jsonplaceholder-postman-tests.md](./api-testing/jsonplaceholder-postman-tests.md) | Second CRUD cycle on a different API to confirm skills transfer, not just repeat steps — found different conventions from ReqRes (status codes, response structure), reinforcing that API behavior must be verified per-service rather than assumed |
 | WebSocket Testing (XQA) | [api-testing/websocket-testing.md](./api-testing/websocket-testing.md) | Server accepts malformed/unrecognized messages without validation; inconsistent message-type key across different server responses |
+| API Error Handling (XQA) | [api-testing/api-error-handling.md](./api-testing/api-error-handling.md) | All 8 error responses (400–503) correctly structured and semantically distinct (e.g. 401 vs 403); one UI bug found — malformed status label ("0 Timeout") on the Request Timeout card |
 
 ## Tools Used
 
