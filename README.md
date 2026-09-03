@@ -4,7 +4,7 @@ Aspiring QA Engineer | Manual Testing → Automation
 
 ## About
 
-I'm learning manual QA testing with the goal of moving into Automation and eventually DevOps. This repository documents my practice on [XQA.io](https://xqa.io), a QA training sandbox, as well as hands-on API testing in Postman, where I test individual UI components, full forms, connected user flows, REST APIs, and WebSocket connections, design test cases, write automated checks, and report bugs the way I would on a real project.
+I'm learning manual QA testing with the goal of moving into Automation and eventually DevOps. This repository documents my practice on [XQA.io](https://xqa.io), a QA training sandbox, as well as hands-on API testing in Postman and SQL practice in PostgreSQL, where I test individual UI components, full forms, connected user flows, REST APIs, and WebSocket connections, design test cases, write automated checks, query databases, and report bugs the way I would on a real project.
 
 ## Testing Approach
 
@@ -21,6 +21,7 @@ Across these test cases, I apply the following techniques:
 - **Cross-API verification** — repeating the same testing approach on a second, independent API (JSONPlaceholder after ReqRes) to confirm the underlying skill transfers, rather than just repeating memorized steps
 - **Protocol-aware testing** — adapting my approach for WebSocket's persistent, bidirectional connection model rather than applying REST-style request/response assumptions
 - **API design/documentation review** — when a listed API turns out to be a non-executable reference (reserved `example.com` domain), switching from Pass/Fail execution to reviewing endpoint naming consistency and completeness instead
+- **Data-driven verification (SQL)** — designing normalized schemas with justified data types (e.g. `DECIMAL` over `FLOAT` for money, `TIMESTAMPTZ` over `TIMESTAMP` for time-zone-aware dates), and using `JOIN`/`LEFT JOIN` + `IS NULL` to find orphaned records directly at the data layer, rather than trusting only what the application UI shows
 
 ## Recurring Findings
 
@@ -68,6 +69,16 @@ Both patterns reflect the same underlying habit: cross-checking a hypothesis acr
 | Profile | [book-store-app/profile.md](./book-store-app/profile.md) | "Register" link redirects to the same destination as "Login" instead of a distinct registration flow |
 | Book Store API (docs) | [book-store-app/api.md](./book-store-app/api.md) | Recognized a non-executable reference API (reserved domain) and switched to a documentation review — found inconsistent `Book`/`Books` naming and a missing identifier on the DELETE endpoint |
 
+### SQL
+
+| Topic | File | Content |
+|-------|------|---------|
+| Basics | [sql/basics.md](./sql/basics.md) | Designed 4 related tables (users, products, orders, order_items) — justified data type choices (`DECIMAL` over `FLOAT` for money, `TIMESTAMPTZ` over `TIMESTAMP`), `PRIMARY KEY` / `FOREIGN KEY` |
+| Filtering | [sql/filtering.md](./sql/filtering.md) | `WHERE`, `BETWEEN`, `IN`, `LIKE`/`ILIKE`, `AND`/`OR` precedence, computed columns via `AS` |
+| JOIN | [sql/join.md](./sql/join.md) | `INNER JOIN` vs `LEFT JOIN`, filtering in `WHERE` vs `ON`, multi-table chains, finding orphaned records (`LEFT JOIN` + `IS NULL`) |
+| UNION | [sql/union.md](./sql/union.md) | Combining independent `SELECT` queries, `UNION ALL`, sorting after combination |
+| Aggregation | [sql/aggregation.md](./sql/aggregation.md) | `GROUP BY` + `COUNT`/`SUM`, difference between `WHERE` (pre-grouping) and `HAVING` (post-grouping) |
+
 ## Tools Used
 
 - Google Sheets (test case drafting)
@@ -75,7 +86,8 @@ Both patterns reflect the same underlying habit: cross-checking a hypothesis acr
 - Git & GitHub (version control)
 - Postman (API testing, automated assertions, Collections, Environment variables, Collection Runner)
 - WebSocket testing (connection lifecycle, message validation, protocol-level testing)
+- SQL (PostgreSQL, DBeaver) — schema design, filtering, joins, aggregation
 
 ## Next Steps
 
-Currently reviewing and reinforcing REST API and Postman automation fundamentals before starting a structured Python → Selenium roadmap (Git, SQL, Pytest, API automation with `requests`, Selenium/Page Object Model), building toward a QA Automation Engineer portfolio.
+Continuing with Python fundamentals and building toward a QA Automation Engineer portfolio: Pytest & test design, API automation with `requests`, Selenium for UI automation (Page Object Model), and basic infrastructure knowledge (Linux, Docker, CI/CD concepts).
