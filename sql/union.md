@@ -1,10 +1,10 @@
-# SQL — UNION
+# SQL â€” UNION
 
-Practice exercises covering `UNION ALL` — combining the results of two separate `SELECT` queries into one list, tagging each half with a literal status column, and sorting the combined result.
+Practice exercises covering `UNION ALL` â€” combining the results of two separate `SELECT` queries into one list, tagging each half with a literal status column, and sorting the combined result.
 
 ## Schema
 
-Tasks 1–2 use two new tables. Task 3 reuses `products` and `order_items` from [join.md](./join.md).
+Tasks 1â€“2 use two new tables. Task 3 reuses `products` and `order_items` from [join.md](./join.md).
 
 ```sql
 CREATE TABLE users1 (
@@ -36,7 +36,7 @@ INSERT INTO orderss (id, user_id, order_date, status) VALUES
 
 ---
 
-## Task 1 — Active and inactive users in one list
+## Task 1 â€” Active and inactive users in one list
 
 **Goal:** produce one export for a CRM containing both active and inactive users, each tagged with its status.
 
@@ -56,14 +56,22 @@ WHERE is_active = FALSE
 ORDER BY name;
 ```
 
+**Result:**
+
+| id | name | user_status |
+|----|-------|--------------|
+| 1 | Bob | active |
+| 2 | Dima | inactive |
+| 3 | Vadim | active |
+
 **Notes:**
-- `is_active` only stores `TRUE`/`FALSE`. `'active'`/`'inactive'` in `SELECT` aren't read from any column — they're literal text values written directly into the query, applied to every row each `SELECT` returns. `WHERE` and `SELECT` are independent: `WHERE` decides which rows qualify, `SELECT` decides what to display for them — the text has to be written consistently with the filter by hand, the database doesn't check that they match.
-- `UNION ALL` (not `UNION`) is safe here because the two halves are mutually exclusive (`is_active = TRUE` vs `= FALSE`) — no real duplicate rows can occur, so there's no need for `UNION`'s extra duplicate-checking work.
-- `ORDER BY` is written once, after both queries — it sorts the already-combined result, not each half separately.
+- `is_active` only stores `TRUE`/`FALSE`. `'active'`/`'inactive'` in `SELECT` aren't read from any column â€” they're literal text values written directly into the query, applied to every row each `SELECT` returns. `WHERE` and `SELECT` are independent: `WHERE` decides which rows qualify, `SELECT` decides what to display for them â€” the text has to be written consistently with the filter by hand, the database doesn't check that they match.
+- `UNION ALL` (not `UNION`) is safe here because the two halves are mutually exclusive (`is_active = TRUE` vs `= FALSE`) â€” no real duplicate rows can occur, so there's no need for `UNION`'s extra duplicate-checking work.
+- `ORDER BY` is written once, after both queries â€” it sorts the already-combined result, not each half separately.
 
 ---
 
-## Task 2 — Orders before and after a cutoff date, in one feed
+## Task 2 â€” Orders before and after a cutoff date, in one feed
 
 **Goal:** see which orders happened before a new site version launched and which came after.
 
@@ -83,6 +91,17 @@ WHERE order_date >= '2024-01-01'
 ORDER BY order_date, order_id;
 ```
 
+**Result:**
+
+| order_id | user_id | order_date | period |
+|----------|---------|------------|--------|
+| 6 | 3 | 2023-06-30 | old |
+| 1 | 1 | 2023-11-05 | old |
+| 2 | 2 | 2023-12-20 | old |
+| 3 | 3 | 2024-01-01 | new |
+| 4 | 1 | 2024-02-15 | new |
+| 5 | 2 | 2024-03-10 | new |
+
 **Notes:**
 - Same pattern as Task 1, applied to a date boundary instead of a boolean flag: two mutually exclusive `WHERE` conditions (`<` vs `>=`), each tagged with its own literal `period` value.
 - `>=` on the "new" side means the cutoff date itself (`2024-01-01`) counts as new, not old.
@@ -90,7 +109,7 @@ ORDER BY order_date, order_id;
 
 ---
 
-## Task 3 — Products that have and haven't been ordered
+## Task 3 â€” Products that have and haven't been ordered
 
 **Goal:** distinguish products that sell from ones sitting unsold.
 
@@ -111,7 +130,16 @@ WHERE oi.product_id IS NULL
 ORDER BY product_name;
 ```
 
+**Result:**
+
+| product_id | product_name | product_status |
+|------------|----------------------|------------------|
+| 3 | iPhone 15 | ordered |
+| 4 | Logitech MX Master | ordered |
+| 1 | Mi Band 7 | ordered |
+| 2 | Surface Pro | ordered |
+
 **Notes:**
-- `p` / `oi` are table aliases — short names for `products` and `order_items` so they don't have to be spelled out on every column reference.
+- `p` / `oi` are table aliases â€” short names for `products` and `order_items` so they don't have to be spelled out on every column reference.
 - `DISTINCT` matters only in the first half: a product bought in several separate orders would otherwise appear once per order line. The second half doesn't need it, since a product missing from `order_items` can only produce one unmatched row per product.
-- The "never ordered" half reuses the standard orphan-finding pattern (`LEFT JOIN` + `IS NULL`) from the join practice — in the current dataset every product has been ordered at least once, so this half returns 0 rows, and the combined result is just the four ordered products.
+- The "never ordered" half reuses the standard orphan-finding pattern (`LEFT JOIN` + `IS NULL`) from the join practice â€” in the current dataset every product has been ordered at least once, so this half returns 0 rows, and the combined result above is just the four ordered products.

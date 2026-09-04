@@ -40,8 +40,22 @@ WHERE in_stock = TRUE
 ORDER BY id ASC;
 ```
 
+**Result:**
+
+| id | name | category | price |
+|----|---------------------|-------------|--------|
+| 1 | iPhone 15 | Электроника | 80000 |
+| 5 | Наушники Pro | Электроника | 12000 |
+| 8 | MX Master Mouse | mouse | 1200 |
+| 9 | Budget Tablet | tablet | 900 |
+| 10 | Android Smartphone | smartphone | 1300 |
+| 11 | Smartwatch Basic | smartwatch | 700 |
+| 12 | USB-C Cable | accessory | 80 |
+| 14 | Never Ordered Item | accessory | 600 |
+
 **Notes:**
 - `in_stock` is a boolean column, so `in_stock = TRUE` (or just `WHERE in_stock`) filters directly on it — no string comparison needed.
+- `id = 13` (Old Camera, `in_stock = FALSE`) is correctly excluded.
 
 ---
 
@@ -58,8 +72,18 @@ WHERE price BETWEEN 500 AND 900
 ORDER BY price ASC;
 ```
 
+**Result:**
+
+| name | category | price |
+|---------------------|------------|-------|
+| Old Camera | camera | 500 |
+| Never Ordered Item | accessory | 600 |
+| Smartwatch Basic | smartwatch | 700 |
+| Budget Tablet | tablet | 900 |
+
 **Notes:**
 - `BETWEEN` is inclusive on both ends — 500 and 900 themselves are included, unlike writing `price > 500 AND price < 900`.
+- Old Camera is included here even though it's out of stock — this task filters by price only, not availability.
 
 ---
 
@@ -76,6 +100,14 @@ WHERE category IN ('tablet', 'smartphone', 'mouse')
   AND price >= 100
 ORDER BY price DESC;
 ```
+
+**Result:**
+
+| id | name | category | price |
+|----|---------------------|------------|-------|
+| 10 | Android Smartphone | smartphone | 1300 |
+| 8 | MX Master Mouse | mouse | 1200 |
+| 9 | Budget Tablet | tablet | 900 |
 
 **Notes:**
 - `IN (...)` checks membership in a list — cleaner than chaining several `category = '...' OR category = '...'` conditions.
@@ -96,6 +128,13 @@ WHERE (price < 100 OR price > 50000)
   AND in_stock;
 ```
 
+**Result:**
+
+| name | price | price_with_discount |
+|-------------|-------|-----------------------|
+| iPhone 15 | 80000 | 68000.00 |
+| USB-C Cable | 80 | 68.00 |
+
 **Notes:**
 - The parentheses around `price < 100 OR price > 50000` are required. Without them, `AND` binds tighter than `OR` in SQL, so `WHERE price < 100 OR price > 50000 AND in_stock` would actually evaluate as `price < 100 OR (price > 50000 AND in_stock)` — silently including out-of-stock cheap items, which isn't the intended logic.
 - A 15% discount means the customer pays 85% of the price, hence `* 0.85`.
@@ -112,15 +151,44 @@ WHERE (price < 100 OR price > 50000)
 -- products with "pro" in the name (case-insensitive)
 SELECT name FROM products
 WHERE name ILIKE '%pro%';
+```
 
+**Result:**
+
+| name |
+|--------------|
+| Наушники Pro |
+
+```sql
 -- products with "mx" in the name (case-insensitive)
 SELECT name FROM products
 WHERE name ILIKE '%mx%';
+```
 
+**Result:**
+
+| name |
+|------------------|
+| MX Master Mouse |
+
+```sql
 -- products that do NOT have "iPhone" in the name
 SELECT name FROM products
 WHERE name NOT ILIKE '%iPhone%';
 ```
+
+**Result:**
+
+| name |
+|---------------------|
+| Наушники Pro |
+| MX Master Mouse |
+| Budget Tablet |
+| Android Smartphone |
+| Smartwatch Basic |
+| USB-C Cable |
+| Old Camera |
+| Never Ordered Item |
 
 **Notes:**
 - `ILIKE` (unlike `LIKE`) ignores case, matching the "regardless of case" requirement.
@@ -147,6 +215,16 @@ WHERE in_stock = TRUE
   AND category != 'smartwatch';
 ```
 
+**Result:**
+
+| name | category | price | price_with_markup | price_with_vat |
+|---------------------|------------|-------|---------------------|------------------|
+| MX Master Mouse | mouse | 1200 | 1560.00 | 1800.00 |
+| Budget Tablet | tablet | 900 | 1170.00 | 1350.00 |
+| Android Smartphone | smartphone | 1300 | 1690.00 | 1950.00 |
+| Never Ordered Item | accessory | 600 | 780.00 | 900.00 |
+
 **Notes:**
-- `category != 'smartwatch'` is a direct equality check, not a pattern match — `NOT ILIKE '%smartwatch%'` would have been the wrong tool here, since the category column holds an exact value, not free text to search inside.
+- `category != 'smartwatch'` is a direct equality check, not a pattern match — `NOT ILIKE '%smartwatch%'` would have been the wrong tool here, since the category column holds an exact value, not free text to search inside. This correctly drops Smartwatch Basic even though its price (700) would otherwise qualify.
+- Old Camera and Naushniki Pro / iPhone 15 are excluded by the price range and/or `in_stock` condition, not by the category filter.
 - Combines everything from the earlier tasks in one query: a boolean filter, an inclusive range, an exclusion, and two independent computed columns.

@@ -40,8 +40,18 @@ GROUP BY category
 ORDER BY products_count DESC;
 ```
 
+**Result:**
+
+| category | products_count |
+|------------|------------------|
+| tablet | 1 |
+| smartphone | 1 |
+| smartwatch | 1 |
+| mouse | 1 |
+
 **Notes:**
 - `GROUP BY category` splits all rows into buckets by category first; `COUNT(*)` then counts rows separately within each bucket, instead of counting the whole table at once.
+- Every category has exactly one product in this table, so the counts tie — with real data of uneven category sizes, `ORDER BY products_count DESC` would put the largest category first.
 - Dropping `ORDER BY` wouldn't change which rows come back or their counts — only the order they're displayed in. Without it, the result isn't guaranteed to come back in any particular order, so a person reading the report would have to scan every row to find the largest category instead of seeing it immediately at the top.
 
 ---
@@ -62,8 +72,16 @@ GROUP BY order_id
 ORDER BY order_revenue DESC;
 ```
 
+**Result:**
+
+| order_id | total_quantity | order_revenue |
+|----------|-----------------|-----------------|
+| 103 | 1 | 1299.00 |
+| 101 | 2 | 1119.00 |
+| 102 | 2 | 98.00 |
+
 **Notes:**
-- `SUM(quantity * price_at_purchase)` first computes the line total for each row (quantity × price), then adds those line totals together within each order group.
+- `SUM(quantity * price_at_purchase)` first computes the line total for each row (quantity × price), then adds those line totals together within each order group. Order 101 has two lines (iPhone 15 + Logitech MX Master), so its revenue is the sum of both: 999.00 + 120.00 = 1119.00.
 - Adding a column like `product_id` to `SELECT` without also adding it to `GROUP BY` or wrapping it in an aggregate isn't allowed: order 101 has two different `product_id` values in the raw data, so once rows are grouped only by `order_id`, there's no single correct `product_id` left to display for that group — SQL has no way to pick one.
 
 ---
@@ -85,8 +103,14 @@ GROUP BY order_items.order_id
 ORDER BY order_revenue DESC;
 ```
 
+**Result:**
+
+| order_id | order_revenue |
+|----------|-----------------|
+| 101 | 1119.00 |
+
 **Notes:**
-- `WHERE` removes non-paid rows before grouping happens, so cancelled/created orders never contribute to any `SUM`.
+- `WHERE` removes non-paid rows before grouping happens, so cancelled/created orders never contribute to any `SUM`. Order 102 (`created`) and 103 (`cancelled`) are excluded entirely, leaving only order 101 (`paid`).
 - A real reason to look only at paid orders: revenue reporting. Counting `created` or `cancelled` orders in a revenue total would overstate money actually received — those orders may never be paid for at all.
 
 ---
@@ -106,9 +130,16 @@ HAVING COUNT(*) >= 2
 ORDER BY active_users_count DESC;
 ```
 
+**Result:**
+
+| country | active_users_count |
+|---------|-----------------------|
+| KZ | 2 |
+| RU | 2 |
+
 **Notes:**
 - `is_active = TRUE` belongs in `WHERE`, not `HAVING`, because it's a property of an individual row (a single user), and can be checked before any grouping happens. `HAVING COUNT(*) >= 2` belongs after grouping, because "how many active users a country has" only exists once the rows have already been grouped and counted — there's no per-row value to filter on.
-- Without the `WHERE` filter, `COUNT(*)` would count every user per country regardless of activity, which isn't what the task asks for.
+- USA has one active user (Bob) and is correctly excluded by `HAVING`. Without the `WHERE` filter, `COUNT(*)` would count every user per country regardless of activity, which isn't what the task asks for.
 
 ---
 
@@ -129,9 +160,17 @@ ORDER BY total_quantity_sold DESC
 LIMIT 3;
 ```
 
+**Result:**
+
+| product_name | total_quantity_sold |
+|----------------------|------------------------|
+| Mi Band 7 | 2 |
+| iPhone 15 | 1 |
+| Logitech MX Master | 1 |
+
 **Notes:**
 - Grouping by `products.name` (rather than by `order_id`, as in Task 2) rolls up quantities sold across every order a product appears in, giving one total per product instead of one per order.
-- `LIMIT 3` after `ORDER BY DESC` gives the top 3 — sorting has to come first, or `LIMIT` would just cut off an arbitrary 3 rows.
+- `LIMIT 3` after `ORDER BY DESC` gives the top 3 — sorting has to come first, or `LIMIT` would just cut off an arbitrary 3 rows. Surface Pro (also quantity 1) ties with the last two rows shown and is left out of the top 3 by this tie-break.
 
 ---
 
@@ -151,6 +190,13 @@ HAVING SUM(quantity * price_at_purchase) < 100
 ORDER BY order_revenue ASC;
 ```
 
+**Result:**
+
+| order_id | order_revenue |
+|----------|-----------------|
+| 102 | 98.00 |
+
 **Notes:**
 - The revenue threshold is checked with `HAVING`, not `WHERE`, since `order_revenue` only exists as a per-group total after `SUM` runs — there's no single-row `order_revenue` value to filter before grouping.
 - The `SUM(...)` expression is repeated in `HAVING` rather than referencing the `order_revenue` alias directly, since not every SQL engine allows a `SELECT` alias to be reused inside `HAVING`.
+- Orders 101 (1119.00) and 103 (1299.00) are correctly excluded — only order 102 falls under the 100 threshold.

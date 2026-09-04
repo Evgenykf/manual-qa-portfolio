@@ -78,6 +78,14 @@ FROM orders
 INNER JOIN users ON orders.user_id = users.id;
 ```
 
+**Result:**
+
+| order_id | order_date | status | user_name | country |
+|----------|------------|-----------|-----------|---------|
+| 101 | 2024-02-01 | paid | Alice | KZ |
+| 102 | 2024-02-03 | created | Alice | KZ |
+| 103 | 2024-02-05 | cancelled | Bob | USA |
+
 **Notes:**
 - Started from `orders`, since the task requires *all orders* — `orders` determines the row count.
 - `INNER JOIN` and `LEFT JOIN` return the same result here, because every `orders.user_id` is guaranteed to exist in `users` (enforced by the foreign key). The two only diverge when starting from the table that *doesn't* determine row count, or when unmatched rows exist — neither is the case here.
@@ -100,6 +108,12 @@ FROM order_items
 JOIN products ON order_items.product_id = products.id
 WHERE order_items.order_id = 103;
 ```
+
+**Result:**
+
+| order_id | product_name | quantity | price_at_purchase |
+|----------|--------------|----------|--------------------|
+| 103 | Surface Pro | 1 | 1299.00 |
 
 **Notes:**
 - Started from `order_items`, since it's the table that actually holds "which product, in which order, at what price" — `orders` and `products` on their own don't have that link.
@@ -126,6 +140,15 @@ JOIN users ON orders.user_id = users.id
 JOIN products ON order_items.product_id = products.id;
 ```
 
+**Result:**
+
+| order_id | user_name | product_name | quantity | price_at_purchase |
+|----------|-----------|----------------------|----------|--------------------|
+| 101 | Alice | iPhone 15 | 1 | 999.00 |
+| 101 | Alice | Logitech MX Master | 1 | 120.00 |
+| 102 | Alice | Mi Band 7 | 2 | 49.00 |
+| 103 | Bob | Surface Pro | 1 | 1299.00 |
+
 **Notes:**
 - `order_items` doesn't link to `users` directly — there's no shared column. The connection goes through `orders` (`order_items` → `orders` → `users`), so three joins are needed in total.
 
@@ -146,6 +169,15 @@ FROM users
 LEFT JOIN orders ON orders.user_id = users.id;
 ```
 
+**Result:**
+
+| user_name | order_id | status |
+|-----------|----------|-----------|
+| Alice | 101 | paid |
+| Alice | 102 | created |
+| Bob | 103 | cancelled |
+| Charlie | NULL | NULL |
+
 **Notes:**
 - Started from `users` this time, since the task requires *all users* to be preserved. `LEFT JOIN` keeps Charlie (no orders) in the result, with `order_id`/`status` returned as `NULL`. An `INNER JOIN` here would drop him entirely.
 
@@ -165,6 +197,15 @@ SELECT
 FROM products
 LEFT JOIN order_items ON products.id = order_items.product_id;
 ```
+
+**Result:**
+
+| product_name | order_id | quantity |
+|----------------------|----------|----------|
+| iPhone 15 | 101 | 1 |
+| Logitech MX Master | 101 | 1 |
+| Mi Band 7 | 102 | 2 |
+| Surface Pro | 103 | 1 |
 
 **Notes:**
 - Same pattern as Task 4, mirrored for products: start from `products` (the table that must be fully preserved), `LEFT JOIN` to `order_items` so an unpurchased product would still appear with `NULL` order fields. In this dataset every product has at least one purchase, so there's no visible "orphan" row — but the query is written to handle one correctly if it existed.
@@ -191,6 +232,13 @@ JOIN products ON order_items.product_id = products.id
 WHERE orders.status = 'paid';
 ```
 
+**Result:**
+
+| order_id | user_name | product_name | quantity | price_at_purchase |
+|----------|-----------|----------------------|----------|--------------------|
+| 101 | Alice | Logitech MX Master | 1 | 120.00 |
+| 101 | Alice | iPhone 15 | 1 | 999.00 |
+
 **Notes:**
 - With a plain `INNER JOIN`, filtering `status = 'paid'` in `WHERE` or moving it into the `orders` join's `ON` clause produces the same result — `INNER JOIN` discards unmatched rows regardless of where the extra condition sits. The distinction only matters with a `LEFT JOIN`: putting the status filter in `ON` would keep users/orders without a paid order (as `NULL` rows), while `WHERE` would remove them from the result entirely.
 
@@ -216,6 +264,14 @@ JOIN products ON order_items.product_id = products.id
 WHERE users.name = 'Alice';
 ```
 
+**Result:**
+
+| order_id | order_date | product_name | quantity | price_at_purchase |
+|----------|------------|----------------------|----------|--------------------|
+| 101 | 2024-02-01 | iPhone 15 | 1 | 999.00 |
+| 101 | 2024-02-01 | Logitech MX Master | 1 | 120.00 |
+| 102 | 2024-02-03 | Mi Band 7 | 2 | 49.00 |
+
 **Notes:**
 - If Alice had no orders at all, this query would return **0 rows**, not an error. With an `INNER JOIN`, a user without a matching order is dropped at the first join already, so there's nothing left for `WHERE` to filter.
 
@@ -237,7 +293,13 @@ LEFT JOIN order_items ON orders.id = order_items.order_id
 WHERE order_items.order_id IS NULL;
 ```
 
+**Result:**
+
+| order_id | user_id | status |
+|----------|---------|--------|
+| *(0 rows)* | | |
+
 **Notes:**
 - Started from `orders` (the table whose rows must all be considered), `LEFT JOIN` to `order_items` so unmatched orders survive the join with `NULL` in the `order_items` columns, then `WHERE ... IS NULL` isolates exactly those unmatched rows.
 - Replacing `LEFT JOIN` with `INNER JOIN` here would always return 0 rows, regardless of whether an itemless order actually exists — `INNER JOIN` drops unmatched orders before `WHERE` ever runs, so there's nothing left to check for `NULL`. This is the core idea the task is testing: `LEFT JOIN` + `IS NULL` is the standard pattern for finding "orphan" rows; `INNER JOIN` breaks that pattern entirely.
-- No orders are currently itemless in this dataset, so the query correctly returns 0 rows.
+- The empty result here is correct, not a bug — every order in this dataset happens to have at least one item.
