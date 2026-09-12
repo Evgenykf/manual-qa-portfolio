@@ -120,3 +120,43 @@ print(statuses.count("PASSED"))
 **Reasoning:**
 - Converting a list to a `set()` is the simplest way to drop duplicates — sets can't contain repeated values by definition, no loop or condition needed.
 - `.count()` is a list method for counting how many times a specific value appears — useful for quick pass/fail tallies without writing a manual loop with a counter (like the counter-based approach used back in the control-flow topic).
+
+## Bonus Task — Summarizing a test run
+
+**Goal:** combine tuples, dicts, and sets together — turn a list of `(name, status, tags)` tuples into a name→status dict, a single combined set of all tags, and a count of unique test names.
+
+```python
+test_runs = [
+    ("test_login", "PASSED", {"smoke", "api"}),
+    ("test_logout", "FAILED", {"smoke", "ui"}),
+    ("test_signup", "PASSED", {"api", "regression"}),
+    ("test_login", "PASSED", {"smoke", "api"}),
+    ("test_delete_account", "FAILED", {"ui", "critical"}),
+]
+
+pairs = []
+for item in test_runs:
+    pairs.append(item[0:2])
+q = dict(pairs)
+
+all_tags = set()
+for item in test_runs:
+    all_tags = all_tags.union(item[2])
+
+print(q)
+print(all_tags)
+print(len(q))
+```
+
+**Output:**
+```
+{'test_login': 'PASSED', 'test_logout': 'FAILED', 'test_signup': 'PASSED', 'test_delete_account': 'FAILED'}
+{'smoke', 'api', 'ui', 'regression', 'critical'}
+4
+```
+
+**Reasoning:**
+- This needed a pattern not covered directly in the course yet — accumulating results in a loop. Start with an empty list/set before the loop, then build it up one piece at a time inside the loop (`.append()` for the list of pairs, `.union()` reassigned each step for the set of tags).
+- `dict(pairs)` turns a list of 2-item tuples straight into a dict — first element of each pair becomes the key, second becomes the value. Since `test_login` appears twice with the same status, it just collapses into one key — no error, the second occurrence overwrites the first.
+- `len(q)` on the dict gives the count of unique test names for free, since duplicate keys already collapsed when the dict was built — no separate `set()` needed for that part.
+- Took a few wrong turns before landing on this — first tried slicing the whole list of tuples at once instead of one tuple at a time inside a loop, and mixed up which index (`[0:2]` vs `[2]`) held which part of each tuple.
