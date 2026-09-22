@@ -4,7 +4,7 @@ Aspiring QA Engineer | Manual Testing → Automation
 
 ## About
 
-I'm learning manual QA testing with the goal of moving into Automation and eventually DevOps. This repository documents my practice on [XQA.io](https://xqa.io), a QA training sandbox, as well as hands-on API testing in Postman and SQL practice in PostgreSQL, where I test individual UI components, full forms, connected user flows, REST APIs, and WebSocket connections, design test cases, write automated checks, query databases, and report bugs the way I would on a real project.
+I'm learning manual QA testing with the goal of moving into Automation and eventually DevOps. This repository documents my practice on [XQA.io](https://xqa.io), a QA training sandbox, hands-on API testing in Postman, SQL practice in PostgreSQL, and — now — Python fundamentals as I move toward test automation with Pytest and Playwright.
 
 ## Testing Approach
 
@@ -79,6 +79,19 @@ Both patterns reflect the same underlying habit: cross-checking a hypothesis acr
 | UNION | [sql/union.md](./sql/union.md) | Combining independent `SELECT` queries, `UNION ALL`, sorting after combination |
 | Aggregation | [sql/aggregation.md](./sql/aggregation.md) | `GROUP BY` + `COUNT`/`SUM`, difference between `WHERE` (pre-grouping) and `HAVING` (post-grouping) |
 
+### QA Automation — Python (in progress)
+
+| Topic | File | Content |
+|-------|------|---------|
+| Basics | [automation/python/basics.md](./automation/python/basics.md) | Variables, types, boolean vs string status flags, type coercion pitfalls (`"200" == 200`) |
+| Control Flow | [automation/python/control-flow.md](./automation/python/control-flow.md) | `if`/`elif`/`else` branching, short-circuit evaluation, loop increment ordering |
+| Lists & Strings | [automation/python/lists-and-strings.md](./automation/python/lists-and-strings.md) | Slicing, `.split()`, negative indexing for structure-independent parsing, variable overwrite pitfalls |
+| Tuples, Dicts, Sets | [automation/python/tuples-dicts-sets.md](./automation/python/tuples-dicts-sets.md) | Immutability, dict key lookups vs value checks, set operations, combining all three to summarize a test run |
+| Functions | [automation/python/functions.md](./automation/python/functions.md) | `def`, return values vs side effects, variable scope, `sorted(key=lambda...)` |
+| Files & Exceptions | [automation/python/files-exceptions.md](./automation/python/files-exceptions.md) | File I/O, `with...as`, `try`/`except` for handling flaky test elements and malformed API responses |
+| Modules | [automation/python/modules.md](./automation/python/modules.md) | Custom modules, `from...import` vs `import`, built-in `random`/`datetime` |
+| OOP & Decorators | [automation/python/oop-and-decorators.md](./automation/python/oop-and-decorators.md) | Classes, constructors, inheritance (`super()`), polymorphism, decorators — direct foundation for Page Object Model |
+
 ## Tools Used
 
 - Google Sheets (test case drafting)
@@ -87,7 +100,8 @@ Both patterns reflect the same underlying habit: cross-checking a hypothesis acr
 - Postman (API testing, automated assertions, Collections, Environment variables, Collection Runner)
 - WebSocket testing (connection lifecycle, message validation, protocol-level testing)
 - SQL (PostgreSQL, DBeaver) — schema design, filtering, joins, aggregation
+- Python — syntax, OOP, working toward test automation
 
 ## Next Steps
 
-Continuing with Python fundamentals and building toward a QA Automation Engineer portfolio: Pytest & test design, API automation with `requests`, Selenium for UI automation (Page Object Model), and basic infrastructure knowledge (Linux, Docker, CI/CD concepts).
+Manual QA and SQL fundamentals are complete. Currently building the Python foundation for QA Automation: Pytest & test design (fixtures, mocking, parametrization) next, then API automation with `requests`, and Playwright for UI automation (Page Object Model) — chosen for its strong alignment with Python and remote-friendly product companies.
