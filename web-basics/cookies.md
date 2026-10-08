@@ -1,27 +1,24 @@
-Cookies — DevTools practice
+ookies — DevTools Practice
 
-Status
-
-Block: Cookies / Browser Storage
+Status: ✅ Theory + basic practical inspection completed
 Practice: Chrome DevTools
 Test site: the-internet.herokuapp.com/login
-Result: basic theory and practical inspection completed.
 
 1. What is a cookie?
 
 A cookie is a small piece of data stored by the browser and associated with a website.
 
-The basic representation is:
+Basic structure:
 
 Name=Value
 
-A cookie can also have attributes that control where, when, and how it is sent.
+A cookie can also contain attributes that control where, when, and how it is sent.
 
 Main cookie attributes
 
 Attribute
 
-Meaning
+What it controls
 
 Name
 
@@ -29,19 +26,19 @@ Cookie name
 
 Value
 
-Cookie value
+Stored cookie value
 
 Domain
 
-Domain(s) for which the cookie applies
+Which domain(s) can use the cookie
 
 Path
 
-URL path scope
+Which URL paths the cookie applies to
 
 Expires / Max-Age
 
-Lifetime of the cookie
+How long the cookie remains valid
 
 HttpOnly
 
@@ -55,43 +52,59 @@ SameSite
 
 Controls cross-site cookie sending and helps reduce CSRF risk
 
-2. Cookies and authentication
+2. Cookies in authentication
 
-A common authentication flow looks like this:
+A common login flow looks like this:
 
-User enters username/password
+Username + password
         ↓
 POST /authenticate
         ↓
 Server validates credentials
         ↓
-Server returns Set-Cookie
+Response: Set-Cookie
         ↓
-Browser stores the cookie
+Browser stores session cookie
         ↓
-Browser sends Cookie on later matching requests
+Later requests: Cookie: ...
         ↓
-Server uses the session information to identify the session
+Server uses session information
 
-Important distinction:
+Set-Cookie vs Cookie
 
-Set-Cookie is typically sent from server to browser in a response.
+Header
 
-Cookie is sent from browser to server in a request.
+Direction
+
+Purpose
+
+Set-Cookie
+
+Server → Browser
+
+Tells the browser to create or update a cookie
+
+Cookie
+
+Browser → Server
+
+Sends stored cookies with a matching request
+
+This distinction is important when debugging authentication.
 
 3. rack.session observed in practice
 
-During DevTools practice, the application used a cookie named:
+During the DevTools exercise, a cookie named rack.session was observed.
 
-rack.session
+Its value looked like an opaque session identifier. The real value is not documented here, because session values can act as credentials and should not be published.
 
-Its value looked like a long opaque session identifier. The value itself is not documented here because session values are credentials/secrets and should not be published to GitHub.
+Safe documentation example:
 
-The same cookie was observed during the login/session flow in DevTools.
+rack.session=<REDACTED>
 
-4. What was checked in Chrome DevTools
+4. Chrome DevTools practice
 
-Application
+Application → Cookies
 
 Opened:
 
@@ -99,72 +112,88 @@ Application
 → Storage
 → Cookies
 
-Observed:
+Observed the cookie:
 
 rack.session
 
-and inspected its properties such as name, value, domain, path, and security-related attributes.
+Inspected its properties, including:
 
-Network
+Name
 
-Enabled:
+Value
 
-Keep log
+Domain
 
-This keeps network entries visible across navigation/reload events.
+Path
 
-Then inspected the authentication request:
+Expires / Max-Age
+
+HttpOnly
+
+Secure
+
+SameSite
+
+Network → authenticate
+
+Enabled Keep log and inspected the authentication request:
 
 Network
 → authenticate
 → Headers
 → Response Headers
 
-Observed a Set-Cookie response header containing the session cookie.
+Observed a Set-Cookie header containing the session cookie.
 
-The cookie included HttpOnly in the observed response.
+Network → secure
 
-A later protected request (secure) was also inspected, and the session cookie information was visible in the request/response flow.
+Inspected a later request and compared the cookie information with what was visible in Application → Cookies.
+
+This connected the browser's stored cookie with the HTTP request/response flow.
 
 5. What HttpOnly means
 
-HttpOnly means normal page JavaScript cannot read the cookie through document.cookie.
+HttpOnly prevents normal page JavaScript from reading the cookie through document.cookie.
 
 The browser can still send the cookie to the server when the request matches the cookie's rules.
 
-So:
+Important:
 
 HttpOnly ≠ "the server cannot receive the cookie"
 
-Instead, it mainly limits client-side JavaScript access to the cookie.
+It mainly limits client-side JavaScript access.
 
 6. Important observation from the experiment
 
 The rack.session cookie did not visibly change every time login/logout/browser restart was tested.
 
-Therefore, do not use this rule:
+Therefore, this is not a reliable rule:
 
-"A session cookie must always change after every login or logout."
+A session cookie must always change after every login or logout.
 
-That is not a reliable general rule.
+For QA investigation, check the actual browser and HTTP behaviour instead of assuming what the cookie must do.
 
-The correct QA approach is to inspect:
+Useful checks:
 
-cookie attributes;
+Cookie attributes
 
-the Set-Cookie response;
+Set-Cookie in the response
 
-the Cookie request header;
+Cookie in the request
 
-the actual server/application behavior.
+Behaviour before login
 
-The existence of a cookie in Application does not by itself prove that the server currently considers the session authenticated.
+Behaviour after login
+
+Behaviour after logout
+
+The presence of a cookie in DevTools does not, by itself, prove that the server currently considers the session authenticated.
 
 7. Cookie vs localStorage vs sessionStorage
 
 Storage
 
-Automatically sent with HTTP requests
+Sent automatically with matching HTTP requests
 
 JavaScript access
 
@@ -172,7 +201,7 @@ Typical persistence
 
 Cookie
 
-Yes, when applicable
+Yes
 
 Yes, unless HttpOnly
 
@@ -184,7 +213,7 @@ No
 
 Yes
 
-Usually persists after browser restart
+Usually survives browser restart
 
 sessionStorage
 
@@ -194,61 +223,75 @@ Yes
 
 Usually tied to the page/tab session
 
-8. What I learned from the practical exercise
+8. What I learned
 
-I connected the browser UI with the actual HTTP authentication flow:
+The practical exercise connected the browser UI with the HTTP authentication flow:
 
 Login
   ↓
-authenticate request
+ authenticate
   ↓
 Response Headers
   ↓
 Set-Cookie: rack.session=...
   ↓
-Browser stores the cookie
+Browser stores cookie
   ↓
 Application → Cookies
   ↓
 rack.session
+  ↓
+Later HTTP requests can include the cookie
 
-The key idea is that cookies are not just something visible in the browser. They participate directly in HTTP communication between browser and server.
+The main takeaway is that cookies are part of the browser–server HTTP interaction, not just values visible in the browser's storage panel.
 
-9. QA checklist for cookies
+9. QA checklist
 
 When investigating cookies in DevTools, check:
 
-[ ] Name
-[ ] Value (do not publish real secrets)
-[ ] Domain
-[ ] Path
-[ ] Expires / Max-Age
-[ ] HttpOnly
-[ ] Secure
-[ ] SameSite
-[ ] Set-Cookie in the response
-[ ] Cookie in the request
-[ ] Behaviour before login
-[ ] Behaviour after login
-[ ] Behaviour after logout
+Name
+
+Value — never publish real secrets
+
+Domain
+
+Path
+
+Expires / Max-Age
+
+HttpOnly
+
+Secure
+
+SameSite
+
+Set-Cookie in the response
+
+Cookie in the request
+
+Behaviour before login
+
+Behaviour after login
+
+Behaviour after logout
 
 10. Security note
 
-Do not publish real values of:
+Never publish real values of:
 
-session cookies;
+session cookies
 
-authentication tokens;
+authentication tokens
 
-passwords;
+passwords
 
-API keys;
+API keys
 
-authorization headers;
+authorization headers
 
-other secrets.
+other secrets
 
-For GitHub documentation, replace them with placeholders such as:
+Use placeholders in public GitHub documentation:
 
 rack.session=<REDACTED>
 
@@ -260,4 +303,26 @@ Next file:
 
 http.md
 
-The HTTP block should cover requests/responses, methods, headers, body, parameters, status codes, and how cookies fit into HTTP.
+The HTTP block will cover:
+
+Request and Response
+
+HTTP methods
+
+URL
+
+Headers
+
+Body
+
+Query Parameters
+
+Path Parameters
+
+Status Codes
+
+Content-Type
+
+Authentication
+
+Cookies inside HTTP
