@@ -414,11 +414,3 @@ Response Body (when present)
 | Status Codes | Study the main `2xx`, `3xx`, `4xx`, and `5xx` codes from a Manual QA perspective |
 | Redirects and caching | Confirm a redirect chain and study `Location`, conditional requests, and `304` |
 | HTTPS and security | Cover HTTPS basics, authentication, and authorization in the HTTP context |
-
-## 8. GitHub documentation notes
-
-This file records what we actually discussed and observed. It does **not** claim that we created a real user, changed a database, validated a genuine token, or successfully verified a redirect chain.
-
-When documenting requests, use placeholders for credentials and secrets. Do not publish real passwords, session cookie values, access tokens, or other sensitive data.
-
-The HTTP section will be considered complete only after the remaining topics have been studied and the relevant practical observations have been checked. Until then, this file should be updated as each part is completed.
