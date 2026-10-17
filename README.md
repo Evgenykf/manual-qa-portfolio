@@ -4,7 +4,7 @@ Aspiring QA Engineer | Manual Testing → Automation
 
 ## About
 
-I'm learning manual QA testing with the goal of moving into Automation and eventually DevOps. This repository documents my practice on [XQA.io](https://xqa.io), a QA training sandbox, hands-on API testing in Postman, SQL practice in PostgreSQL, Python fundamentals, and - now - web basics (cookies, Chrome DevTools) and first Pytest tests as I move toward test automation with Pytest and Playwright.
+I'm learning manual QA testing with the goal of moving into Automation and eventually DevOps. This repository documents my hands-on QA practice on [XQA.io](https://xqa.io), API testing with Postman, SQL in PostgreSQL, Python fundamentals, and web basics. The web basics section now covers HTTP, cookies and sessions, browser behavior, caching, forms, and Chrome DevTools investigations. I am also building toward test automation with Pytest and Playwright.
 
 ## Testing Approach
 
@@ -21,7 +21,7 @@ Across these test cases, I apply the following techniques:
 - **Cross-API verification** - repeating the same testing approach on a second, independent API (JSONPlaceholder after ReqRes) to confirm the underlying skill transfers, rather than just repeating memorized steps
 - **Protocol-aware testing** - adapting my approach for WebSocket's persistent, bidirectional connection model rather than applying REST-style request/response assumptions
 - **API design/documentation review** - when a listed API turns out to be a non-executable reference (reserved `example.com` domain), switching from Pass/Fail execution to reviewing endpoint naming consistency and completeness instead
-- **Browser-level inspection (DevTools)** - tracing a user action (e.g. Login) through Elements, Console and Network to see the real request behind the UI, and checking cookie attributes (`HttpOnly`, `Secure`, `SameSite`) instead of trusting only what the page shows
+- **Browser-level investigation** - using Chrome DevTools to trace user actions through Elements, Console, Network, and Application; inspecting login requests and cookie attributes; and separating observed browser behavior from hypotheses about redirects, rendering, caching, or server-side causes
 - **Data-driven verification (SQL)** - designing normalized schemas with justified data types (e.g. `DECIMAL` over `FLOAT` for money, `TIMESTAMPTZ` over `TIMESTAMP` for time-zone-aware dates), and using `JOIN`/`LEFT JOIN` + `IS NULL` to find orphaned records directly at the data layer, rather than trusting only what the application UI shows
 
 ## Recurring Findings
@@ -74,8 +74,10 @@ Both patterns reflect the same underlying habit: cross-checking a hypothesis acr
 
 | Topic | File | Content |
 |-------|------|---------|
-| Cookies | [web-basics/cookies.md](./web-basics/cookies.md) | Cookie structure and attributes (`HttpOnly`, `Secure`, `SameSite`), `Set-Cookie` vs `Cookie`, `rack.session` observed in Chrome DevTools, cookie vs localStorage vs sessionStorage, QA checklist and security notes |
-| DevTools: Login Debugging | [web-basics/devtools/login-debugging.md](./web-basics/devtools/login-debugging.md) | Elements, Console (`querySelector`) and Network on a real Login form - found the actual request (`POST /authenticate` → `303 See Other` → redirect back to `/login`) behind the error message |
+| HTTP / HTTPS | [web-basics/http.md](./web-basics/http.md) | Requests and responses, URLs and query parameters, HTTP methods, JSON and form bodies, file uploads, headers, status codes, redirects, cookies, caching and conditional requests, HTTPS, authentication, and a Manual QA checklist |
+| Cookies & Sessions | [web-basics/cookies.md](./web-basics/cookies.md) | Cookie structure and attributes (`HttpOnly`, `Secure`, `SameSite`), `Set-Cookie` vs `Cookie`, `rack.session` observed in Chrome DevTools, cookie vs localStorage vs sessionStorage, QA checklist and security notes |
+| Browser Basics | [web-basics/browser-basics.md](./web-basics/browser-basics.md) | Browser/client/server roles, URL and DNS, navigation and history, page rendering and dynamic loading, memory/disk cache, Back/Forward Cache concepts, tab and incognito state, HTML form validation, and POST resubmission warnings |
+| DevTools: Login Debugging | [web-basics/devtools/login-debugging.md](./web-basics/devtools/login-debugging.md) | Elements, Console (`querySelector`) and Network on a real Login form - traced the actual request (`POST /authenticate` → `303 See Other` → redirect back to `/login`) behind the error message |
 
 ### SQL
 
@@ -111,8 +113,9 @@ Both patterns reflect the same underlying habit: cross-checking a hypothesis acr
 - SQL (PostgreSQL, DBeaver) - schema design, filtering, joins, aggregation
 - Python - syntax, OOP, working toward test automation
 - Pytest - `assert`-based tests, reading test output
-- Chrome DevTools - Elements, Console, Network, Application (cookies)
+- Chrome DevTools - Elements, Console, Network, Application (cookies), browser request inspection and cache investigation
+- HTTP test endpoints (`httpbin`, `httpbingo`) - hands-on inspection of requests, responses, methods, headers, and bodies
 
 ## Next Steps
 
-Manual QA and SQL fundamentals are complete. Currently building the Python foundation for QA Automation, with first Pytest tests (`assert` basics) done: fixtures, mocking and parametrization next, then API automation with `requests`, and Playwright for UI automation (Page Object Model) - chosen for its strong alignment with Python and remote-friendly product companies.
+Manual QA and SQL fundamentals are complete. Web Basics documentation now covers HTTP, cookies, browser behavior, and DevTools investigation; HTML/DOM and responsive behavior remain future topics. Currently building the Python foundation for QA Automation, with first Pytest tests (`assert` basics) done: fixtures, mocking and parametrization next, then API automation with `requests`, and Playwright for UI automation (Page Object Model).
