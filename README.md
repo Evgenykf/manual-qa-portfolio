@@ -1,10 +1,10 @@
 # Manual QA Portfolio - Evgeny
 
-Aspiring QA Engineer | Manual Testing → Automation
+QA Engineering Portfolio | Manual QA Foundation → Python Test Automation
 
 ## About
 
-I'm learning manual QA testing with the goal of moving into Automation and eventually DevOps. This repository documents my hands-on QA practice on [XQA.io](https://xqa.io), API testing with Postman, SQL in PostgreSQL, Python fundamentals, and web basics. The web basics section now covers HTTP, cookies and sessions, browser behavior, caching, forms, and Chrome DevTools investigations. I am also building toward test automation with Pytest and Playwright.
+This repository documents my QA learning through hands-on practice on [XQA.io](https://xqa.io), API testing in Postman, PostgreSQL exercises, Python fundamentals, and browser/web investigation with Chrome DevTools. The Manual QA foundation is now treated as a working baseline; the current focus is moving into Python-based automation with Pytest, followed by API automation with `requests` and UI automation with Playwright. I will revisit specific Manual QA gaps when they become relevant to an automation task rather than delaying automation practice until every topic is exhaustive.
 
 ## Testing Approach
 
@@ -21,7 +21,9 @@ Across these test cases, I apply the following techniques:
 - **Cross-API verification** - repeating the same testing approach on a second, independent API (JSONPlaceholder after ReqRes) to confirm the underlying skill transfers, rather than just repeating memorized steps
 - **Protocol-aware testing** - adapting my approach for WebSocket's persistent, bidirectional connection model rather than applying REST-style request/response assumptions
 - **API design/documentation review** - when a listed API turns out to be a non-executable reference (reserved `example.com` domain), switching from Pass/Fail execution to reviewing endpoint naming consistency and completeness instead
-- **Browser-level investigation** - using Chrome DevTools to trace user actions through Elements, Console, Network, and Application; inspecting login requests and cookie attributes; and separating observed browser behavior from hypotheses about redirects, rendering, caching, or server-side causes
+- **Browser-level inspection (DevTools)** - tracing a user action (e.g. Login) through Elements, Console and Network to see the real request behind the UI, and checking cookie attributes (`HttpOnly`, `Secure`, `SameSite`) instead of trusting only what the page shows
+- **DOM and locator inspection** - inspecting parent/child/sibling relationships and HTML attributes in Elements, checking CSS selectors against the current DOM, and locating actions in the context of a specific table row
+- **Browser behavior investigation** - checking navigation/history, dynamic loading, memory/disk cache observations, native form validation, and POST resubmission prompts while separating observed behavior from a suspected cause
 - **Data-driven verification (SQL)** - designing normalized schemas with justified data types (e.g. `DECIMAL` over `FLOAT` for money, `TIMESTAMPTZ` over `TIMESTAMP` for time-zone-aware dates), and using `JOIN`/`LEFT JOIN` + `IS NULL` to find orphaned records directly at the data layer, rather than trusting only what the application UI shows
 
 ## Recurring Findings
@@ -74,10 +76,11 @@ Both patterns reflect the same underlying habit: cross-checking a hypothesis acr
 
 | Topic | File | Content |
 |-------|------|---------|
-| HTTP / HTTPS | [web-basics/http.md](./web-basics/http.md) | Requests and responses, URLs and query parameters, HTTP methods, JSON and form bodies, file uploads, headers, status codes, redirects, cookies, caching and conditional requests, HTTPS, authentication, and a Manual QA checklist |
-| Cookies & Sessions | [web-basics/cookies.md](./web-basics/cookies.md) | Cookie structure and attributes (`HttpOnly`, `Secure`, `SameSite`), `Set-Cookie` vs `Cookie`, `rack.session` observed in Chrome DevTools, cookie vs localStorage vs sessionStorage, QA checklist and security notes |
-| Browser Basics | [web-basics/browser-basics.md](./web-basics/browser-basics.md) | Browser/client/server roles, URL and DNS, navigation and history, page rendering and dynamic loading, memory/disk cache, Back/Forward Cache concepts, tab and incognito state, HTML form validation, and POST resubmission warnings |
-| DevTools: Login Debugging | [web-basics/devtools/login-debugging.md](./web-basics/devtools/login-debugging.md) | Elements, Console (`querySelector`) and Network on a real Login form - traced the actual request (`POST /authenticate` → `303 See Other` → redirect back to `/login`) behind the error message |
+| Browser Basics | [web-basics/browser-basics.md](./web-basics/browser-basics.md) | Browser/server roles, URL/DNS/HTTPS, navigation history, rendering and dynamic loading, memory/disk cache observations, tab state, form validation and POST resubmission prompts |
+| HTTP / HTTPS | [web-basics/http.md](./web-basics/http.md) | Request/response structure, HTTP methods, JSON bodies, headers, status codes, authentication basics, redirects, caching, ETag/304, forms and file uploads |
+| Cookies | [web-basics/cookies.md](./web-basics/cookies.md) | Cookie structure and attributes (`HttpOnly`, `Secure`, `SameSite`), `Set-Cookie` vs `Cookie`, `rack.session` observed in Chrome DevTools, cookie vs localStorage vs sessionStorage, QA checklist and security notes |
+| DevTools: Login Debugging | [web-basics/devtools/login-debugging.md](./web-basics/devtools/login-debugging.md) | Elements, Console (`querySelector`) and Network on a real Login form - found the actual request (`POST /authenticate` → `303 See Other` → redirect back to `/login`) behind the error message |
+| HTML, DOM and CSS Selectors | [web-basics/html-dom.md](./web-basics/html-dom.md) | DOM tree and element relationships, HTML attributes, CSS selector checks in Elements, contextual targeting in table rows, dynamic error messages and image request inspection in Network |
 
 ### SQL
 
@@ -106,16 +109,19 @@ Both patterns reflect the same underlying habit: cross-checking a hypothesis acr
 ## Tools Used
 
 - Google Sheets (test case drafting)
-- Markdown (documentation format)
-- Git & GitHub (version control)
+- Markdown (technical documentation)
+- Git & GitHub (version control and portfolio)
+- Miro (learning roadmap)
 - Postman (API testing, automated assertions, Collections, Environment variables, Collection Runner)
 - WebSocket testing (connection lifecycle, message validation, protocol-level testing)
 - SQL (PostgreSQL, DBeaver) - schema design, filtering, joins, aggregation
-- Python - syntax, OOP, working toward test automation
-- Pytest - `assert`-based tests, reading test output
-- Chrome DevTools - Elements, Console, Network, Application (cookies), browser request inspection and cache investigation
-- HTTP test endpoints (`httpbin`, `httpbingo`) - hands-on inspection of requests, responses, methods, headers, and bodies
+- Python - fundamentals, collections, functions, exceptions, modules, OOP and decorators
+- Pytest - first `assert`-based tests and reading pass/fail output; learning fixtures and parametrization next
+- Chrome DevTools - Elements, Console, Network, Application (cookies), DOM inspection and request debugging
+- Browser-based HTTP exercises with httpbin / httpbingo
 
 ## Next Steps
 
-Manual QA and SQL fundamentals are complete. Web Basics documentation now covers HTTP, cookies, browser behavior, and DevTools investigation; HTML/DOM and responsive behavior remain future topics. Currently building the Python foundation for QA Automation, with first Pytest tests (`assert` basics) done: fixtures, mocking and parametrization next, then API automation with `requests`, and Playwright for UI automation (Page Object Model).
+Manual QA, Web Basics and SQL are treated as a working baseline and are now closed as dedicated learning blocks. The focus is shifting to AQA; specific gaps will be revisited when they matter to an automation task.
+
+Current focus: strengthen Pytest by practicing fixtures, parametrization, test discovery and reports, then organize the tests into a small maintainable suite. Next, move the existing API-testing knowledge into Python with `requests` and Pytest. After that, build UI automation with Playwright, robust locators, assertions, fixtures and the Page Object Model. Add Git branches / pull requests and GitHub Actions once the automated test suite is ready to run reliably in CI.
